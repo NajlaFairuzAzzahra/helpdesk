@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha384-o5Rm8aWDW39UL4qqvdn4Piz61Kp61nOTsP6ZLbEUMdAa4uNPup9EgFkwZ0+0z5P7" crossorigin="anonymous"></script>
+    <script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @vite(['resources/js/ticket.js'])
     @vite(['resources/js/hardware_ticket.js'])

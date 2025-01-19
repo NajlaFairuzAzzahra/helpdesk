@@ -78,15 +78,27 @@
         <!-- Scope -->
         <div class="mb-6">
             <label for="scope" class="block text-gray-700 font-bold mb-2">Scope:</label>
-            <textarea name="scope" id="scope" rows="3" class="w-full px-3 py-2 border rounded" required></textarea>
+            <textarea name="scope" id="scope" rows="5" class="w-full px-3 py-2 border rounded"></textarea>
         </div>
         <div class="mb-6">
             <label for="description" class="block text-gray-700 font-bold mb-2">Detail Description:</label>
-            <textarea name="description" id="description" rows="4" class="w-full px-3 py-2 border rounded" required></textarea>
+            <textarea name="description" id="description" rows="6" class="w-full px-3 py-2 border rounded"></textarea>
         </div>
+
 
         <!-- Submit -->
         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
     </form>
 </div>
+<script>
+    CKEDITOR.replace('scope', {
+        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+        filebrowserUploadMethod: 'form'
+    });
+    CKEDITOR.replace('description', {
+        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+        filebrowserUploadMethod: 'form'
+    });
+</script>
+
 @endsection
