@@ -5,34 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha384-o5Rm8aWDW39UL4qqvdn4Piz61Kp61nOTsP6ZLbEUMdAa4uNPup9EgFkwZ0+0z5P7" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @vite(['resources/js/ticket.js'])
-    @vite(['resources/js/hardware_ticket.js'])
-
 </head>
-<body>
-    <nav class="bg-gray-800 text-white p-4">
-        <div class="container mx-auto flex justify-between">
-            <div>
-                <a href="{{ url('/') }}" class="text-lg font-bold">Helpdesk System</a>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-800 text-white py-4 px-8 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="{{ route('user.dashboard') }}" class="text-xl font-bold">Helpdesk System</a>
+
+        <!-- Navbar Menu -->
+        <div class="flex items-center space-x-6">
+            <!-- Dropdown IT Requirements -->
+            <div class="relative">
+                <button id="dropdownMenuButton" class="hover:underline focus:outline-none">
+                    IT Requirements 
+                </button>
+                <div id="dropdownMenu" class="hidden absolute bg-gray-700 mt-2 rounded shadow-lg z-10">
+                    <a href="{{ route('software.list') }}" class="block px-4 py-2 hover:bg-gray-600">IT S/W Work Order List</a>
+                    <a href="{{ route('software.monitoring') }}" class="block px-4 py-2 hover:bg-gray-600">IT S/W WO Monitoring</a>
+                    <a href="{{ route('hardware.monitoring') }}" class="block px-4 py-2 hover:bg-gray-600">IT H/W WO Monitoring</a>
+                    <a href="{{ route('troubleshooting') }}" class="block px-4 py-2 hover:bg-gray-600">Troubleshooting</a>
+                </div>
             </div>
-            <div>
-                @auth
-                    <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="mr-4">Dashboard</a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="text-red-500">Logout</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="mr-4">Login</a>
-                @endauth
-            </div>
+
+            <!-- Logout Button -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="hover:underline text-red-500">Logout</button>
+            </form>
         </div>
     </nav>
-    <div class="min-h-screen bg-gray-100">
+
+    <!-- Main Content -->
+    <main class="py-6 px-8">
         @yield('content')
-    </div>
+    </main>
+
+    <!-- Dropdown Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdownButton = document.getElementById("dropdownMenuButton");
+            const dropdownMenu = document.getElementById("dropdownMenu");
+
+            dropdownButton.addEventListener("click", () => {
+                dropdownMenu.classList.toggle("hidden");
+            });
+
+            // Close dropdown when clicked outside
+            document.addEventListener("click", (e) => {
+                if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.add("hidden");
+                }
+            });
+        });
+    </script>
 </body>
 </html>

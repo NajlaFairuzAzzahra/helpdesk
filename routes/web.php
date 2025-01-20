@@ -5,6 +5,11 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SoftwareController;
+use App\Http\Controllers\UatController;
+use App\Http\Controllers\HardwareController;
+use App\Http\Controllers\TroubleshootingController;
+
 
 // Public home page
 Route::get('/', function () {
@@ -46,3 +51,11 @@ require __DIR__ . '/auth.php';
 Route::get('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+Route::middleware(['auth', UserMiddleware::class])->group(function () {
+    // IT Requirements Pages
+    Route::get('/software/list', [SoftwareController::class, 'list'])->name('software.list');
+    Route::get('/software/monitoring', [SoftwareController::class, 'monitoring'])->name('software.monitoring');
+    Route::get('/hardware/monitoring', [HardwareController::class, 'monitoring'])->name('hardware.monitoring');
+    Route::get('/troubleshooting', [TroubleshootingController::class, 'index'])->name('troubleshooting');
+});

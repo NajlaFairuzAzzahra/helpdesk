@@ -10,3 +10,5 @@ import $ from 'jquery';
 
 window.$ = $;
 
+
+
