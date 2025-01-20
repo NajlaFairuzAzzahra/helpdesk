@@ -2,81 +2,85 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
-    public function showSoftwareForm()
+    // Show the list of tickets
+    public function index()
     {
-        return view('ticket.software_form');
+        $tickets = Ticket::where('user_id', Auth::id())->get();
+        return view('ticket.index', compact('tickets'));
     }
 
-    public function submitSoftwareTicket(Request $request)
+    // Show the form for creating a new software ticket
+    public function showSoftwareForm()
+    {
+        return view('ticket.software_form'); // Pastikan file view ini ada
+    }
+
+    public function showHardwareForm()
+    {
+        return view('ticket.hardware_form'); // Pastikan file view ini ada
+    }
+
+    public function monitoring(Request $request)
+    {
+        $query = Ticket::where('user_id', Auth::id());
+
+        // Filter berdasarkan status
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan pencarian
+        if ($request->has('search') && $request->search !== '') {
+            $query->where('id', 'like', '%' . $request->search . '%');
+        }
+
+        // Paginate tiket
+        $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('ticket.monitoring', compact('tickets'));
+    }
+
+    public function show($id)
+    {
+        $ticket = Ticket::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        return view('ticket.show', compact('ticket'));
+    }
+
+
+    // Store a new ticket
+    public function store(Request $request)
     {
         $request->validate([
-            'system' => 'required',
-            'sub_system' => 'required',
-            'sw_wo_type' => 'required', // Tambahkan validasi untuk S/W WO Type
+            'type' => 'required',
+            'system' => 'nullable',
+            'sub_system' => 'nullable',
+            'wo_type' => 'required',
             'scope' => 'required',
             'description' => 'required',
         ]);
 
-        // Simpan data ke database atau logic lain
-        // Ticket::create($request->all());
+        Ticket::create([
+            'user_id' => Auth::id(),
+            'type' => $request->type,
+            'system' => $request->system,
+            'sub_system' => $request->sub_system,
+            'wo_type' => $request->wo_type,
+            'scope' => $request->scope,
+            'description' => $request->description,
+        ]);
 
-        return redirect()->route('ticket.software.form')->with('success', 'Ticket created successfully.');
+        return redirect()->route('ticket.index')->with('success', 'Ticket created successfully!');
     }
-
-    public function getSubSystems(Request $request)
-    {
-        $system = $request->input('system');
-        $subSystems = [];
-
-        switch ($system) {
-            case 'SAP':
-                $subSystems = ['Material Management (MM)', 'Sales Distribution', 'Production Planning', 'Plant Maintenance (PM)'];
-                break;
-            case 'SAP Report':
-                $subSystems = ['All Module'];
-                break;
-            case 'PAYROLL':
-                $subSystems = ['Module'];
-                break;
-            case 'DDIS':
-                $subSystems = ['Sales'];
-                break;
-            case 'OPEX':
-                $subSystems = ['Sales'];
-                break;
-            case 'MSF':
-                $subSystems = ['Sales'];
-                break;
-        }
-
-        return response()->json($subSystems);
-    }
-
-    public function showHardwareForm()
+    public function getHardwares(Request $request)
 {
-    return view('ticket.hardware_form');
-}
-
-public function submitHardwareTicket(Request $request)
-{
-    $request->validate([
-        'infrastructure' => 'required',
-        'hardware' => 'required',
-        'scope' => 'required',
-        'description' => 'required',
-    ]);
-
-    // Simpan data ke database atau logic lain
-    return redirect()->route('ticket.hardware.form')->with('success', 'Hardware ticket created successfully.');
-}
-
-public function getHardwares(Request $request)
-{
-    $infrastructure = $request->input('infrastructure');
+    $infrastructure = $request->query('infrastructure');
     $hardwares = [];
 
     switch ($infrastructure) {
@@ -94,6 +98,34 @@ public function getHardwares(Request $request)
     return response()->json($hardwares);
 }
 
+public function getSubSystems(Request $request)
+{
+    $system = $request->query('system');
+    $subSystems = [];
+
+    switch ($system) {
+        case 'SAP':
+            $subSystems = ['Material Management (MM)', 'Sales Distribution', 'Production Planning', 'Plant Maintenance (PM)'];
+            break;
+        case 'SAP Report':
+            $subSystems = ['All Module'];
+            break;
+        case 'PAYROLL':
+            $subSystems = ['Module'];
+            break;
+        case 'DDIS':
+            $subSystems = ['Sales'];
+            break;
+        case 'OPEX':
+            $subSystems = ['Sales'];
+            break;
+        case 'MSF':
+            $subSystems = ['Sales'];
+            break;
+    }
+
+    return response()->json($subSystems);
+}
 
 
 }
