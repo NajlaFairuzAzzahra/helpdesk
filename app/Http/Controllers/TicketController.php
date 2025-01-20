@@ -53,6 +53,28 @@ class TicketController extends Controller
         return view('ticket.show', compact('ticket'));
     }
 
+    public function submitSoftwareTicket(Request $request)
+    {
+        $request->validate([
+            'system' => 'required',
+            'sub_system' => 'required',
+            'scope' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        Ticket::create([
+            'user_id' => Auth::id(),
+            'type' => 'software',
+            'status' => 'Open',
+            'system' => $request->system,
+            'sub_system' => $request->sub_system,
+            'scope' => $request->scope,
+            'description' => $request->description,
+        ]);
+
+        // Redirect ke dashboard user
+        return redirect()->route('user.dashboard')->with('success', 'Software ticket submitted successfully!');
+    }
 
     // Store a new ticket
     public function store(Request $request)
@@ -127,5 +149,27 @@ public function getSubSystems(Request $request)
     return response()->json($subSystems);
 }
 
+public function submitHardwareTicket(Request $request)
+{
+    $request->validate([
+        'infrastructure' => 'required',
+        'hardware' => 'required',
+        'scope' => 'required|string|max:255',
+        'description' => 'required|string',
+    ]);
+
+    Ticket::create([
+        'user_id' => Auth::id(),
+        'type' => 'hardware',
+        'status' => 'Open',
+        'system' => $request->infrastructure,
+        'sub_system' => $request->hardware,
+        'scope' => $request->scope,
+        'description' => $request->description,
+    ]);
+
+    // Redirect ke dashboard user
+    return redirect()->route('user.dashboard')->with('success', 'Hardware ticket submitted successfully!');
+}
 
 }

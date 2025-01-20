@@ -24,7 +24,7 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
 });
 
 // User routes
-Route::middleware(['auth', UserMiddleware::class])->group(function () {
+Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/user/dashboard', function () {
         return view('user.dashboard');
     })->name('user.dashboard');
@@ -57,16 +57,9 @@ Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController
 Route::middleware(['auth', UserMiddleware::class])->group(function () {
     // IT Requirements Pages
     Route::get('/software/list', [SoftwareController::class, 'list'])->name('software.list');
-    Route::get('/software/monitoring', [SoftwareController::class, 'monitoring'])->name('software.monitoring');
-    Route::get('/hardware/monitoring', [HardwareController::class, 'monitoring'])->name('hardware.monitoring');
     Route::get('/troubleshooting', [TroubleshootingController::class, 'index'])->name('troubleshooting');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/tickets', [TicketController::class, 'index'])->name('ticket.index');
-    Route::get('/tickets/create', [TicketController::class, 'create'])->name('ticket.create');
-    Route::post('/tickets', [TicketController::class, 'store'])->name('ticket.store');
-});
 
 //monitoring
 Route::middleware(['auth'])->group(function () {
@@ -75,7 +68,29 @@ Route::get('/user/tickets/{id}', [TicketController::class, 'show'])->name('user.
 });
 
 //dashboard admin,
+// Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/tickets', [AdminTicketController::class, 'index'])->name('admin.tickets.index');
-    Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'update'])->name('admin.tickets.update');
+    Route::get('/admin/dashboard', [AdminTicketController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'updateStatus'])->name('admin.tickets.update');
+    Route::get('/admin/tickets/export', [AdminTicketController::class, 'exportToPdf'])->name('admin.tickets.export'); // Export to PDF
 });
+
+//troubleshooting user-admin
+Route::middleware(['auth'])->group(function () {
+    // User Routes
+    Route::get('/user/troubleshooting', [TroubleshootingController::class, 'index'])->name('user.troubleshooting');
+    Route::get('/user/troubleshooting/{id}', [TroubleshootingController::class, 'show'])->name('user.troubleshooting.show');
+
+    // Admin Routes
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/admin/troubleshooting', [TroubleshootingController::class, 'adminIndex'])->name('admin.troubleshooting');
+        Route::post('/admin/troubleshooting/{id}/respond', [TroubleshootingController::class, 'respond'])->name('admin.troubleshooting.respond');
+    });
+});
+
+//monitoring
+Route::middleware(['auth'])->group(function () {
+    Route::get('/software/monitoring', [SoftwareController::class, 'monitoring'])->name('software.monitoring');
+    Route::get('/hardware/monitoring', [HardwareController::class, 'monitoring'])->name('hardware.monitoring');
+});
+
