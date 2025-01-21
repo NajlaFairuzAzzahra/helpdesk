@@ -11,17 +11,26 @@ class SoftwareController extends Controller
 {
     $query = Ticket::where('type', 'software');
 
+    // Filter berdasarkan status
     if ($request->has('status') && $request->status !== '') {
         $query->where('status', $request->status);
     }
 
+    // Filter berdasarkan pencarian (misalnya berdasarkan Ticket ID)
     if ($request->has('search') && $request->search !== '') {
         $query->where('id', 'like', '%' . $request->search . '%');
     }
 
-    $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
+    // Sortir berdasarkan kolom (jika ada parameter sort)
+    if ($request->has('sort') && in_array($request->sort, ['id', 'status', 'created_at'])) {
+        $sortOrder = $request->get('order', 'asc'); // Default ascending
+        $query->orderBy($request->sort, $sortOrder);
+    } else {
+        $query->orderBy('created_at', 'desc'); // Default sort by created_at
+    }
 
-    return view('software_monitoring', compact('tickets'));
-}
+    $tickets = $query->paginate(10);
 
+    return view('software.monitoring', compact('tickets'));
+    }
 }

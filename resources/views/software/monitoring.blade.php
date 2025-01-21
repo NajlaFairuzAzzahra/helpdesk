@@ -33,7 +33,15 @@
                 <tr class="border-b hover:bg-gray-100">
                     <td class="py-2 px-4">{{ $ticket->id }}</td>
                     <td class="py-2 px-4">{{ ucfirst($ticket->type) }}</td>
-                    <td class="py-2 px-4">{{ $ticket->status }}</td>
+                    <td class="py-2 px-4">
+                        @if ($ticket->status === 'Open')
+                            <span class="text-green-500">{{ $ticket->status }}</span>
+                        @elseif ($ticket->status === 'Pending')
+                            <span class="text-yellow-500">{{ $ticket->status }}</span>
+                        @else
+                            <span class="text-red-500">{{ $ticket->status }}</span>
+                        @endif
+                    </td>
                     <td class="py-2 px-4">{{ $ticket->created_at->format('d M Y, H:i') }}</td>
                 </tr>
             @empty
