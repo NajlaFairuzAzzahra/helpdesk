@@ -23,7 +23,7 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     })->name('admin.dashboard');
 });
 
-// User routes
+// User Dashboard
 Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/user/dashboard', function () {
         return view('user.dashboard');
@@ -36,13 +36,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/ticket/software', [TicketController::class, 'showSoftwareForm'])->name('ticket.software.form');
     Route::post('/ticket/software', [TicketController::class, 'submitSoftwareTicket'])->name('ticket.software.submit');
     Route::get('/get-sub-systems', [TicketController::class, 'getSubSystems'])->name('get.subsystems');
-    Route::post('/ticket/store', [TicketController::class, 'store'])->name('ticket.store');
 
     // Hardware Ticket
     Route::get('/ticket/hardware', [TicketController::class, 'showHardwareForm'])->name('ticket.hardware.form');
     Route::post('/ticket/hardware', [TicketController::class, 'submitHardwareTicket'])->name('ticket.hardware.submit');
     Route::get('/get-hardwares', [TicketController::class, 'getHardwares'])->name('get.hardwares');
-    Route::post('/ticket/store', [TicketController::class, 'store'])->name('ticket.store');
 });
 
 // CKEditor upload route

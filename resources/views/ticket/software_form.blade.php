@@ -20,7 +20,7 @@
         </div>
     @endif
 
-    <form action="{{ route('ticket.software.submit') }}" method="POST">
+    <form action="{{ route('ticket.software.submit') }}" method="POST" onsubmit="return false;">
         @csrf
 
         <!-- Order Metadata -->
@@ -55,12 +55,13 @@
                 <option value="OPEX">OPEX</option>
                 <option value="MSF">MSF</option>
             </select>
-        </div>
+           </div>
         <div class="mb-6">
             <label for="sub_system" class="block text-gray-700 font-bold mb-2">Sub-system:</label>
             <select name="sub_system" id="sub_system" class="w-full px-3 py-2 border rounded" required>
                 <option value="">-- Select Sub-system --</option>
             </select>
+
         </div>
 
         <!-- s/w wo   -->

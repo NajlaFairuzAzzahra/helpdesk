@@ -100,54 +100,54 @@ class TicketController extends Controller
 
         return redirect()->route('ticket.index')->with('success', 'Ticket created successfully!');
     }
+    public function getSubSystems(Request $request)
+    {
+        $system = $request->query('system');
+        $subSystems = [];
+
+        switch ($system) {
+            case 'SAP':
+                $subSystems = ['Material Management (MM)', 'Sales Distribution', 'Production Planning', 'Plant Maintenance (PM)'];
+                break;
+            case 'SAP Report':
+                $subSystems = ['All Module'];
+                break;
+            case 'PAYROLL':
+                $subSystems = ['Module'];
+                break;
+            case 'DDIS':
+                $subSystems = ['Sales'];
+                break;
+            case 'OPEX':
+                $subSystems = ['Sales'];
+                break;
+            case 'MSF':
+                $subSystems = ['Sales'];
+                break;
+        }
+
+        return response()->json($subSystems);
+    }
+
     public function getHardwares(Request $request)
-{
-    $infrastructure = $request->query('infrastructure');
-    $hardwares = [];
+    {
+        $infrastructure = $request->query('infrastructure');
+        $hardwares = [];
 
-    switch ($infrastructure) {
-        case 'Peripheral':
-            $hardwares = ['Computer', 'Printer', 'FAX', 'Scanner', 'Telephone', 'Modem', 'Others'];
-            break;
-        case 'Server':
-            $hardwares = ['Email Server', 'SAP Server', 'Web Server'];
-            break;
-        case 'Internet':
-            $hardwares = ['-'];
-            break;
+        switch ($infrastructure) {
+            case 'Peripheral':
+                $hardwares = ['Computer', 'Printer', 'FAX', 'Scanner', 'Telephone', 'Modem', 'Others'];
+                break;
+            case 'Server':
+                $hardwares = ['Email Server', 'SAP Server', 'Web Server'];
+                break;
+            case 'Internet':
+                $hardwares = ['-'];
+                break;
+        }
+
+        return response()->json($hardwares);
     }
-
-    return response()->json($hardwares);
-}
-
-public function getSubSystems(Request $request)
-{
-    $system = $request->query('system');
-    $subSystems = [];
-
-    switch ($system) {
-        case 'SAP':
-            $subSystems = ['Material Management (MM)', 'Sales Distribution', 'Production Planning', 'Plant Maintenance (PM)'];
-            break;
-        case 'SAP Report':
-            $subSystems = ['All Module'];
-            break;
-        case 'PAYROLL':
-            $subSystems = ['Module'];
-            break;
-        case 'DDIS':
-            $subSystems = ['Sales'];
-            break;
-        case 'OPEX':
-            $subSystems = ['Sales'];
-            break;
-        case 'MSF':
-            $subSystems = ['Sales'];
-            break;
-    }
-
-    return response()->json($subSystems);
-}
 
     public function submitHardwareTicket(Request $request)
     {

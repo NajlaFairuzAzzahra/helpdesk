@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class AdminTicketController extends Controller
 {
@@ -14,25 +16,29 @@ class AdminTicketController extends Controller
         $query = Ticket::query();
 
         // Filter berdasarkan status
-        if ($request->has('status') && $request->status !== '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter berdasarkan tipe
-        if ($request->has('type') && $request->type !== '') {
+        // Filter berdasarkan tipe (Software/Hardware)
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        // Filter berdasarkan user
-        if ($request->has('user') && $request->user !== '') {
+        // Filter berdasarkan pengguna
+        if ($request->filled('user')) {
             $query->where('user_id', $request->user);
         }
 
+        // Ambil tiket dengan paginasi
         $tickets = $query->with('user')->paginate(10);
+
+        // Semua pengguna untuk dropdown
         $users = User::all();
 
         return view('admin.dashboard', compact('tickets', 'users'));
     }
+
 
     // Update Status Tiket
     public function updateStatus(Request $request, $id)

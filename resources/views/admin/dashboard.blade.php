@@ -5,19 +5,21 @@
     <h1 class="text-3xl font-bold text-gray-700 mb-6">Admin Dashboard</h1>
 
     <!-- Filter Form -->
-    <form method="GET" action="{{ route('admin.dashboard') }}" class="mb-6 flex items-center space-x-4">
-        <select name="status" class="px-4 py-2 border rounded">
+    <form id="filter-form" method="GET" action="{{ route('admin.dashboard') }}" class="mb-6 flex items-center space-x-4">
+        <select name="status" class="px-4 py-2 border rounded" onchange="document.getElementById('filter-form').submit();">
             <option value="">-- All Status --</option>
             <option value="Open" {{ request('status') === 'Open' ? 'selected' : '' }}>Open</option>
             <option value="Pending" {{ request('status') === 'Pending' ? 'selected' : '' }}>Pending</option>
             <option value="Closed" {{ request('status') === 'Closed' ? 'selected' : '' }}>Closed</option>
         </select>
-        <select name="type" class="px-4 py-2 border rounded">
+
+        <select name="type" class="px-4 py-2 border rounded" onchange="document.getElementById('filter-form').submit();">
             <option value="">-- All Types --</option>
             <option value="Software" {{ request('type') === 'Software' ? 'selected' : '' }}>Software</option>
             <option value="Hardware" {{ request('type') === 'Hardware' ? 'selected' : '' }}>Hardware</option>
         </select>
-        <select name="user" class="px-4 py-2 border rounded">
+
+        <select name="user" class="px-4 py-2 border rounded" onchange="document.getElementById('filter-form').submit();">
             <option value="">-- All Users --</option>
             @foreach ($users as $user)
                 <option value="{{ $user->id }}" {{ request('user') == $user->id ? 'selected' : '' }}>
@@ -25,7 +27,6 @@
                 </option>
             @endforeach
         </select>
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
     </form>
 
     <!-- Ticket Table -->
@@ -43,9 +44,9 @@
             @forelse ($tickets as $ticket)
                 <tr class="border-b hover:bg-gray-100">
                     <td class="py-2 px-4">{{ $ticket->id }}</td>
-                    <td class="py-2 px-4">{{ $ticket->type }}</td>
+                    <td class="py-2 px-4">{{ ucfirst($ticket->type) }}</td>
                     <td class="py-2 px-4">{{ $ticket->user->name }}</td>
-                    <td class="py-2 px-4">{{ $ticket->status }}</td>
+                    <td class="py-2 px-4">{{ ucfirst($ticket->status) }}</td>
                     <td class="py-2 px-4">
                         <form method="POST" action="{{ route('admin.tickets.update', $ticket->id) }}">
                             @csrf
@@ -66,7 +67,7 @@
                 </tr>
             @endforelse
         </tbody>
-    </table>
+            </table>
     <div class="mt-4">
         {{ $tickets->links() }}
     </div>

@@ -4,7 +4,7 @@
 <div class="container mx-auto py-8">
     <h1 class="text-3xl font-bold text-gray-700 mb-6">IT H/W Work Order Request Form</h1>
 
-    <form action="{{ route('ticket.hardware.submit') }}" method="POST">
+    <form action="{{ route('ticket.software.submit') }}" method="POST" onsubmit="return false;">
         @csrf
 
         <!-- Order Metadata -->
@@ -42,7 +42,6 @@
             <select name="hardware" id="hardware" class="w-full px-3 py-2 border rounded" required>
                 <option value="">-- Select Hardware --</option>
             </select>
-        </div>
 
         <!-- Scope -->
         <div class="mb-6">
