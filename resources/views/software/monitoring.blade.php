@@ -5,17 +5,15 @@
     <h1 class="text-3xl font-bold text-gray-700 mb-6">IT S/W WO Monitoring</h1>
 
     <!-- Filter Form -->
-    <form method="GET" action="{{ route('software.monitoring') }}" class="mb-6 flex items-center space-x-4">
-        <select name="status" class="px-4 py-2 border rounded">
+    <form id="filterForm" method="GET" action="{{ route('software.monitoring') }}" class="mb-6 flex items-center space-x-4">
+        <select name="status" id="statusFilter" class="px-4 py-2 border rounded">
             <option value="">-- All Status --</option>
             <option value="Open" {{ request('status') === 'Open' ? 'selected' : '' }}>Open</option>
             <option value="Pending" {{ request('status') === 'Pending' ? 'selected' : '' }}>Pending</option>
             <option value="Closed" {{ request('status') === 'Closed' ? 'selected' : '' }}>Closed</option>
         </select>
 
-        <input type="text" name="search" placeholder="Search Ticket ID" value="{{ request('search') }}" class="px-4 py-2 border rounded">
-
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+        <input type="text" name="search" id="searchInput" placeholder="Search Ticket ID" value="{{ request('search') }}" class="px-4 py-2 border rounded">
     </form>
 
     <!-- Table -->
@@ -51,5 +49,31 @@
             @endforelse
         </tbody>
     </table>
+
+    <!-- Pagination -->
+    <div class="mt-4">
+        {{ $tickets->links() }}
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterForm = document.getElementById('filterForm');
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+
+        // Trigger form submission when status dropdown changes
+        statusFilter.addEventListener('change', () => {
+            filterForm.submit();
+        });
+
+        // Trigger form submission when search input loses focus
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchInput.dataset.timer);
+            searchInput.dataset.timer = setTimeout(() => {
+                filterForm.submit();
+            }, 500); // Delay to avoid spamming requests
+        });
+    });
+</script>
 @endsection

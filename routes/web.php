@@ -94,3 +94,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hardware/monitoring', [HardwareController::class, 'monitoring'])->name('hardware.monitoring');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/work-order-list', [TicketController::class, 'workOrderList'])->name('work_order.list');
+});

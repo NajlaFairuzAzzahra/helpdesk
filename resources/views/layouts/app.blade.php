@@ -24,7 +24,7 @@
                     IT Requirements
                 </button>
                 <div id="dropdownMenu" class="hidden absolute bg-gray-700 mt-2 rounded shadow-lg z-10">
-                    <a href="{{ route('software.list') }}" class="block px-4 py-2 hover:bg-gray-600">IT S/W Work Order List</a>
+                    <a href="{{ route('work_order.list') }}" class="block px-4 py-2 hover:bg-gray-600">Work Order List</a>
                     <a href="{{ route('software.monitoring') }}" class="block px-4 py-2 hover:bg-gray-600">IT S/W WO Monitoring</a>
                     <a href="{{ route('hardware.monitoring') }}" class="block px-4 py-2 hover:bg-gray-600">IT H/W WO Monitoring</a>
                     <a href="{{ route('troubleshooting') }}" class="block px-4 py-2 hover:bg-gray-600">Troubleshooting</a>

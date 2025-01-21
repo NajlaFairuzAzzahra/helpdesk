@@ -149,27 +149,48 @@ public function getSubSystems(Request $request)
     return response()->json($subSystems);
 }
 
-public function submitHardwareTicket(Request $request)
-{
-    $request->validate([
-        'infrastructure' => 'required',
-        'hardware' => 'required',
-        'scope' => 'required|string|max:255',
-        'description' => 'required|string',
-    ]);
+    public function submitHardwareTicket(Request $request)
+    {
+        $request->validate([
+            'infrastructure' => 'required',
+            'hardware' => 'required',
+            'scope' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
 
-    Ticket::create([
-        'user_id' => Auth::id(),
-        'type' => 'hardware',
-        'status' => 'Open',
-        'system' => $request->infrastructure,
-        'sub_system' => $request->hardware,
-        'scope' => $request->scope,
-        'description' => $request->description,
-    ]);
+        Ticket::create([
+            'user_id' => Auth::id(),
+            'type' => 'hardware',
+            'status' => 'Open',
+            'system' => $request->infrastructure,
+            'sub_system' => $request->hardware,
+            'scope' => $request->scope,
+            'description' => $request->description,
+        ]);
 
-    // Redirect ke dashboard user
-    return redirect()->route('user.dashboard')->with('success', 'Hardware ticket submitted successfully!');
-}
+        // Redirect ke dashboard user
+        return redirect()->route('user.dashboard')->with('success', 'Hardware ticket submitted successfully!');
+    }
+
+    public function workOrderList(Request $request)
+    {
+        $query = Ticket::where('user_id', Auth::id());
+
+        // Filter berdasarkan status
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan pencarian
+        if ($request->has('search') && $request->search !== '') {
+            $query->where('id', 'like', '%' . $request->search . '%');
+        }
+
+        // Paginate tiket
+        $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('ticket.work_order_list', compact('tickets'));
+    }
+
 
 }
