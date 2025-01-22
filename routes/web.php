@@ -18,9 +18,9 @@ Route::get('/', function () {
 
 // Admin routes
 Route::middleware(['auth', AdminMiddleware::class])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', [AdminTicketController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'updateStatus'])->name('admin.tickets.update');
+    Route::get('/admin/tickets/export', [AdminTicketController::class, 'exportToPdf'])->name('admin.tickets.export'); // Export to PDF
 });
 
 // User Dashboard
@@ -52,46 +52,41 @@ Route::get('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::
 Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
+// IT Requirements Pages
 Route::middleware(['auth', UserMiddleware::class])->group(function () {
-    // IT Requirements Pages
     Route::get('/software/list', [SoftwareController::class, 'list'])->name('software.list');
     Route::get('/troubleshooting', [TroubleshootingController::class, 'index'])->name('troubleshooting');
 });
 
-
-//monitoring
+// Monitoring routes
 Route::middleware(['auth'])->group(function () {
-Route::get('/user/tickets', [TicketController::class, 'monitoring'])->name('user.tickets.monitoring');
-Route::get('/user/tickets/{id}', [TicketController::class, 'show'])->name('user.tickets.show');
-});
-
-//dashboard admin,
-// Admin routes
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminTicketController::class, 'index'])->name('admin.dashboard');
-    Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'updateStatus'])->name('admin.tickets.update');
-    Route::get('/admin/tickets/export', [AdminTicketController::class, 'exportToPdf'])->name('admin.tickets.export'); // Export to PDF
-});
-
-//troubleshooting user-admin
-Route::middleware(['auth'])->group(function () {
-    // User Routes
-    Route::get('/user/troubleshooting', [TroubleshootingController::class, 'index'])->name('user.troubleshooting');
-    Route::get('/user/troubleshooting/{id}', [TroubleshootingController::class, 'show'])->name('user.troubleshooting.show');
-
-    // Admin Routes
-    Route::middleware(['admin'])->group(function () {
-        Route::get('/admin/troubleshooting', [TroubleshootingController::class, 'adminIndex'])->name('admin.troubleshooting');
-        Route::post('/admin/troubleshooting/{id}/respond', [TroubleshootingController::class, 'respond'])->name('admin.troubleshooting.respond');
-    });
-});
-
-//monitoring
-Route::middleware(['auth'])->group(function () {
+    Route::get('/user/tickets', [TicketController::class, 'monitoring'])->name('user.tickets.monitoring');
+    Route::get('/user/tickets/{id}', [TicketController::class, 'show'])->name('user.tickets.show');
     Route::get('/software/monitoring', [SoftwareController::class, 'monitoring'])->name('software.monitoring');
     Route::get('/hardware/monitoring', [HardwareController::class, 'monitoring'])->name('hardware.monitoring');
 });
 
+// Work Order List
 Route::middleware(['auth'])->group(function () {
     Route::get('/work-order-list', [TicketController::class, 'workOrderList'])->name('work_order.list');
+});
+
+// Delete routes for User and Admin
+Route::middleware(['auth', 'user'])->group(function () {
+    Route::delete('/user/tickets/{id}', [TicketController::class, 'destroy'])->name('user.tickets.delete');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::delete('/admin/tickets/{id}', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
+});
+
+// Troubleshooting routes for User and Admin
+Route::middleware(['auth'])->group(function () {
+    Route::get('/user/troubleshooting', [TroubleshootingController::class, 'index'])->name('user.troubleshooting');
+    Route::get('/user/troubleshooting/{id}', [TroubleshootingController::class, 'show'])->name('user.troubleshooting.show');
+
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/admin/troubleshooting', [TroubleshootingController::class, 'adminIndex'])->name('admin.troubleshooting');
+        Route::post('/admin/troubleshooting/{id}/respond', [TroubleshootingController::class, 'respond'])->name('admin.troubleshooting.respond');
+    });
 });

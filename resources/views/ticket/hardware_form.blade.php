@@ -4,7 +4,7 @@
 <div class="container mx-auto py-8">
     <h1 class="text-3xl font-bold text-gray-700 mb-6">IT H/W Work Order Request Form</h1>
 
-    <form action="{{ route('ticket.software.submit') }}" method="POST" onsubmit="return false;">
+    <form action="{{ route('ticket.software.submit') }}" method="POST">
         @csrf
 
         <!-- Order Metadata -->

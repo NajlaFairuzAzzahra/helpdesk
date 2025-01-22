@@ -20,7 +20,7 @@
         </div>
     @endif
 
-    <form action="{{ route('ticket.software.submit') }}" method="POST" onsubmit="return false;">
+    <form action="{{ route('ticket.software.submit') }}" method="POST">
         @csrf
 
         <!-- Order Metadata -->

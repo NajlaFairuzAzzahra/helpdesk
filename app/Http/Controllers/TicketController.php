@@ -58,21 +58,22 @@ class TicketController extends Controller
         $request->validate([
             'system' => 'required',
             'sub_system' => 'required',
-            'scope' => 'required|string|max:255',
-            'description' => 'required|string',
+            'sw_wo_type' => 'required',
+            'scope' => 'required',
+            'description' => 'required',
         ]);
 
         Ticket::create([
             'user_id' => Auth::id(),
-            'type' => 'software',
-            'status' => 'Open',
+            'type' => 'Software',
             'system' => $request->system,
             'sub_system' => $request->sub_system,
+            'wo_type' => $request->sw_wo_type,
             'scope' => $request->scope,
             'description' => $request->description,
+            'status' => 'Open',
         ]);
 
-        // Redirect ke dashboard user
         return redirect()->route('user.dashboard')->with('success', 'Software ticket submitted successfully!');
     }
 
@@ -154,23 +155,23 @@ class TicketController extends Controller
         $request->validate([
             'infrastructure' => 'required',
             'hardware' => 'required',
-            'scope' => 'required|string|max:255',
-            'description' => 'required|string',
+            'scope' => 'required',
+            'description' => 'required',
         ]);
 
         Ticket::create([
             'user_id' => Auth::id(),
-            'type' => 'hardware',
-            'status' => 'Open',
-            'system' => $request->infrastructure,
-            'sub_system' => $request->hardware,
+            'type' => 'Hardware',
+            'infrastructure' => $request->infrastructure,
+            'hardware' => $request->hardware,
             'scope' => $request->scope,
             'description' => $request->description,
+            'status' => 'Open',
         ]);
 
-        // Redirect ke dashboard user
         return redirect()->route('user.dashboard')->with('success', 'Hardware ticket submitted successfully!');
     }
+
 
     public function workOrderList(Request $request)
     {
@@ -192,5 +193,13 @@ class TicketController extends Controller
         return view('ticket.work_order_list', compact('tickets'));
     }
 
+    //delete ticket
+    public function destroy($id)
+    {
+        $ticket = Ticket::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $ticket->delete();
+
+        return redirect()->route('user.tickets.monitoring')->with('success', 'Ticket deleted successfully!');
+    }
 
 }

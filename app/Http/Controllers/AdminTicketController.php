@@ -53,4 +53,16 @@ class AdminTicketController extends Controller
 
         return redirect()->route('admin.dashboard')->with('success', 'Ticket status updated successfully!');
     }
+
+    //delete ticket
+    public function destroy($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        $ticket->delete();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Ticket deleted successfully!');
+    }
+
 }
+
+
