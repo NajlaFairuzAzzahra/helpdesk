@@ -8,7 +8,8 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/ticket.js',
-                'resources/js/hardware_ticket.js'
+                'resources/js/hardware_ticket.js',
+                'resources/js/admin_dashboard.js'
             ],
             refresh: true,
         }),

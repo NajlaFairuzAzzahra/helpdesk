@@ -7,7 +7,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/ticket.js', 'resources/js/hardware_ticket.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/ticket.js', 'resources/js/hardware_ticket.js', 'resources/js/admin_dashboard.js'])
 
 </head>
 <body class="bg-gray-100">

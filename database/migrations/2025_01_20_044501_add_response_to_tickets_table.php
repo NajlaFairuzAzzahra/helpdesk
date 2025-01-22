@@ -4,25 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->text('response')->nullable(); // Kolom untuk respons admin
+            if (!Schema::hasColumn('tickets', 'response')) {
+                $table->text('response')->nullable();
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('tickets', 'response')) {
+                $table->dropColumn('response');
+            }
         });
     }
 };

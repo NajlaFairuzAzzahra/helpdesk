@@ -46,11 +46,13 @@
                     <td class="py-2 px-4">{{ $ticket->user->name }}</td>
                     <td class="py-2 px-4">{{ $ticket->status }}</td>
                     <td class="py-2 px-4">
-                        <form method="POST" action="{{ route('admin.tickets.delete', $ticket->id) }}" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:underline">Delete</button>
-                        </form>
+                        <!-- Delete Button -->
+                        <button
+                            type="button"
+                            class="text-red-500 hover:underline"
+                            onclick="openDeleteModal({{ $ticket->id }})">
+                            Delete
+                        </button>
                     </td>
                 </tr>
             @empty
@@ -65,4 +67,29 @@
         {{ $tickets->links() }}
     </div>
 </div>
+
+<!-- Delete Modal -->
+@foreach ($tickets as $ticket)
+<div id="deleteModal-{{ $ticket->id }}" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white rounded shadow p-6 w-1/3">
+        <h2 class="text-xl font-bold mb-4">Confirm Delete</h2>
+        <p>Are you sure you want to delete ticket ID: <strong>{{ $ticket->id }}</strong>?</p>
+        <div class="mt-4 flex justify-end space-x-4">
+            <button
+                type="button"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                onclick="closeDeleteModal({{ $ticket->id }})">
+                Cancel
+            </button>
+            <form method="POST" action="{{ route('admin.tickets.delete', $ticket->id) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    Confirm
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
 @endsection

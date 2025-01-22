@@ -17,6 +17,7 @@ $(document).ready(function () {
                         data.forEach(function (subSystem) {
                             subSystemDropdown.append(`<option value="${subSystem}">${subSystem}</option>`);
                         });
+
                     }
                 },
                 error: function () {

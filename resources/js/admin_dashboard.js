@@ -1,3 +1,20 @@
+// Make functions globally accessible
+window.openDeleteModal = function (ticketId) {
+    console.log(`Opening modal for ticket ID: ${ticketId}`);
+    const modal = document.getElementById(`deleteModal-${ticketId}`);
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+};
+
+window.closeDeleteModal = function (ticketId) {
+    console.log(`Closing modal for ticket ID: ${ticketId}`);
+    const modal = document.getElementById(`deleteModal-${ticketId}`);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const filters = document.querySelectorAll('select');
 
@@ -5,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filter.addEventListener('change', () => {
             const params = new URLSearchParams(window.location.search);
 
-            // Update URL params sesuai filter
             filters.forEach(sel => {
                 if (sel.value) {
                     params.set(sel.name, sel.value);
@@ -14,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Redirect ke URL baru dengan filter
             window.location.href = `${window.location.pathname}?${params.toString()}`;
         });
     });

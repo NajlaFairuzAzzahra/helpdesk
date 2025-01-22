@@ -17,10 +17,12 @@ Route::get('/', function () {
 })->name('home');
 
 // Admin routes
-Route::middleware(['auth', AdminMiddleware::class])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminTicketController::class, 'index'])->name('admin.dashboard');
     Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'updateStatus'])->name('admin.tickets.update');
-    Route::get('/admin/tickets/export', [AdminTicketController::class, 'exportToPdf'])->name('admin.tickets.export'); // Export to PDF
+    // Route::delete('/admin/tickets/{id}/delete', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
+    Route::delete('/admin/tickets/{id}', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
+    Route::get('/admin/tickets/export', [AdminTicketController::class, 'exportToPdf'])->name('admin.tickets.export');
 });
 
 // User Dashboard
@@ -71,14 +73,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/work-order-list', [TicketController::class, 'workOrderList'])->name('work_order.list');
 });
 
-// Delete routes for User and Admin
-Route::middleware(['auth', 'user'])->group(function () {
-    Route::delete('/user/tickets/{id}', [TicketController::class, 'destroy'])->name('user.tickets.delete');
-});
+// // Delete routes for User and Admin
+// Route::middleware(['auth', 'user'])->group(function () {
+//     Route::delete('/user/tickets/{id}', [TicketController::class, 'destroy'])->name('user.tickets.delete');
+// });
 
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::delete('/admin/tickets/{id}', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
-});
 
 // Troubleshooting routes for User and Admin
 Route::middleware(['auth'])->group(function () {

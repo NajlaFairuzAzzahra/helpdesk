@@ -22,3 +22,13 @@
         display: block;
     }
 }
+
+.hidden {
+    display: none;
+}
+.fixed {
+    position: fixed;
+}
+.bg-black {
+    background-color: rgba(0, 0, 0, 0.5);
+}
