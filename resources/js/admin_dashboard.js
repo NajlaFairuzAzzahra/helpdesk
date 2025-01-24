@@ -1,19 +1,69 @@
 // Make functions globally accessible
-window.openDeleteModal = function (ticketId) {
-    console.log(`Opening modal for ticket ID: ${ticketId}`);
-    const modal = document.getElementById(`deleteModal-${ticketId}`);
+window.openDeleteModal = function (id) {
+    const modal = document.getElementById(`deleteModal-${id}`);
     if (modal) {
-        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    } else {
+        console.error(`Delete modal for ticket ID ${id} not found.`);
     }
 };
 
-window.closeDeleteModal = function (ticketId) {
-    console.log(`Closing modal for ticket ID: ${ticketId}`);
-    const modal = document.getElementById(`deleteModal-${ticketId}`);
+window.closeDeleteModal = function (id) {
+    const modal = document.getElementById(`deleteModal-${id}`);
     if (modal) {
-        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    } else {
+        console.error(`Delete modal for ticket ID ${id} not found.`);
     }
 };
+
+
+window.openEditModal = function (id) {
+    const modal = document.getElementById(`editModal-${id}`);
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error(`Edit modal for ticket ID ${id} not found.`);
+    }
+};
+
+window.closeEditModal = function (id) {
+    const modal = document.getElementById(`editModal-${id}`);
+    if (modal) {
+        modal.style.display = 'none';
+    } else {
+        console.error(`Edit modal for ticket ID ${id} not found.`);
+    }
+};
+
+function submitEditForm(id) {
+    const form = document.querySelector(`#editModal-${id} form`);
+    if (form) {
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+        })
+            .then((response) => {
+                if (response.ok) {
+                    closeEditModal(id);
+                    location.reload(); // Reload to reflect changes
+                } else {
+                    alert('Failed to update ticket. Please try again.');
+                }
+            })
+            .catch(() => {
+                alert('An error occurred. Please try again.');
+            });
+    } else {
+        console.error(`Form for ticket ID ${id} not found.`);
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const filters = document.querySelectorAll('select');

@@ -19,10 +19,10 @@ Route::get('/', function () {
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminTicketController::class, 'index'])->name('admin.dashboard');
-    Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'updateStatus'])->name('admin.tickets.update');
-    // Route::delete('/admin/tickets/{id}/delete', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
-    Route::delete('/admin/tickets/{id}', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
+    Route::post('/admin/tickets/{id}/update', [AdminTicketController::class, 'update'])->name('admin.tickets.update');
+    Route::delete('/admin/tickets/{id}/delete', [AdminTicketController::class, 'destroy'])->name('admin.tickets.delete');
     Route::get('/admin/tickets/export', [AdminTicketController::class, 'exportToPdf'])->name('admin.tickets.export');
+    Route::get('/admin/tickets/{id}', [AdminTicketController::class, 'show'])->name('admin.tickets.show');
 });
 
 // User Dashboard
@@ -30,20 +30,9 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/user/dashboard', function () {
         return view('user.dashboard');
     })->name('user.dashboard');
+
 });
 
-// Ticket routes
-Route::middleware('auth')->group(function () {
-    // Software Ticket
-    Route::get('/ticket/software', [TicketController::class, 'showSoftwareForm'])->name('ticket.software.form');
-    Route::post('/ticket/software', [TicketController::class, 'submitSoftwareTicket'])->name('ticket.software.submit');
-    Route::get('/get-sub-systems', [TicketController::class, 'getSubSystems'])->name('get.subsystems');
-
-    // Hardware Ticket
-    Route::get('/ticket/hardware', [TicketController::class, 'showHardwareForm'])->name('ticket.hardware.form');
-    Route::post('/ticket/hardware', [TicketController::class, 'submitHardwareTicket'])->name('ticket.hardware.submit');
-    Route::get('/get-hardwares', [TicketController::class, 'getHardwares'])->name('get.hardwares');
-});
 
 // CKEditor upload route
 Route::post('/ckeditor/upload', [FileUploadController::class, 'upload'])->name('ckeditor.upload');
@@ -64,8 +53,8 @@ Route::middleware(['auth', UserMiddleware::class])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/user/tickets', [TicketController::class, 'monitoring'])->name('user.tickets.monitoring');
     Route::get('/user/tickets/{id}', [TicketController::class, 'show'])->name('user.tickets.show');
-    Route::get('/software/monitoring', [SoftwareController::class, 'monitoring'])->name('software.monitoring');
-    Route::get('/hardware/monitoring', [HardwareController::class, 'monitoring'])->name('hardware.monitoring');
+    Route::get('/software/monitoring', [TicketController::class, 'monitorSoftware'])->name('software.monitoring');
+    Route::get('/hardware/monitoring', [TicketController::class, 'monitorHardware'])->name('hardware.monitoring');
 });
 
 // Work Order List
@@ -86,6 +75,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['admin'])->group(function () {
         Route::get('/admin/troubleshooting', [TroubleshootingController::class, 'adminIndex'])->name('admin.troubleshooting');
-        Route::post('/admin/troubleshooting/{id}/respond', [TroubleshootingController::class, 'respond'])->name('admin.troubleshooting.respond');
+        Route::post('/admin/troubleshooting/respond', [AdminTicketController::class, 'respondToTroubleshooting'])->name('admin.troubleshooting.respond');
     });
 });
+
+Route::get('/ticket/software', [TicketController::class, 'showSoftwareForm'])->name('ticket.software.form');
+Route::post('/ticket/software', [TicketController::class, 'submitSoftwareTicket'])->name('ticket.software.submit');
+Route::get('/ticket/hardware', [TicketController::class, 'showHardwareForm'])->name('ticket.hardware.form');
+Route::post('/ticket/hardware', [TicketController::class, 'submitHardwareTicket'])->name('ticket.hardware.submit');
+Route::get('/get-sub-systems', [TicketController::class, 'getSubSystems'])->name('get.subsystems');
+Route::get('/get-hardwares', [TicketController::class, 'getHardwares'])->name('get.hardwares');

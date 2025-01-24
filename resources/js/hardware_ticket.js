@@ -1,28 +1,31 @@
-$(document).ready(function () {
-    $('#infrastructure').on('change', function (event) {
-        event.preventDefault();
-        const infrastructure = $(this).val();
-        const hardwareDropdown = $('#hardware');
+document.addEventListener("DOMContentLoaded", function () {
+    const infrastructureDropdown = document.getElementById("infrastructure");
+    const hardwareDropdown = document.getElementById("hardware");
 
-        hardwareDropdown.html('<option value="">-- Select Hardware --</option>');
+    if (infrastructureDropdown) {
+        infrastructureDropdown.addEventListener("change", function (event) {
+            event.preventDefault(); // Prevent the default form submission
+            const selectedInfrastructure = this.value;
 
-        if (infrastructure) {
-            $.ajax({
-                url: `${window.location.origin}/get-hardwares`,
-                type: 'GET',
-                data: { infrastructure },
-                success: function (data) {
-                    console.log(data); // Debugging response
-                    if (data && data.length > 0) {
-                        data.forEach(function (hardware) {
-                            hardwareDropdown.append(`<option value="${hardware}">${hardware}</option>`);
-                        });
-                    }
-                },
-                error: function () {
-                    alert('Failed to fetch hardwares. Please try again.');
-                },
-            });
-        }
-    });
+            hardwareDropdown.innerHTML = '<option value="">-- Select Hardware --</option>';
+
+            if (selectedInfrastructure) {
+                fetch(`/get-hardwares?infrastructure=${selectedInfrastructure}`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data && data.length > 0) {
+                            data.forEach((hardware) => {
+                                const option = document.createElement("option");
+                                option.value = hardware;
+                                option.textContent = hardware;
+                                hardwareDropdown.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching hardware:", error);
+                    });
+            }
+        });
+    }
 });

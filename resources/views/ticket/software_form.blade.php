@@ -55,16 +55,15 @@
                 <option value="OPEX">OPEX</option>
                 <option value="MSF">MSF</option>
             </select>
-           </div>
+        </div>
         <div class="mb-6">
             <label for="sub_system" class="block text-gray-700 font-bold mb-2">Sub-system:</label>
             <select name="sub_system" id="sub_system" class="w-full px-3 py-2 border rounded" required>
                 <option value="">-- Select Sub-system --</option>
             </select>
-
         </div>
 
-        <!-- s/w wo   -->
+        <!-- S/W WO -->
         <div class="mb-6">
             <label for="sw_wo_type" class="block text-gray-700 font-bold mb-2">S/W WO Type:</label>
             <select name="sw_wo_type" id="sw_wo_type" class="w-full px-3 py-2 border rounded" required>
@@ -86,12 +85,41 @@
             <textarea name="description" id="description" rows="6" class="w-full px-3 py-2 border rounded"></textarea>
         </div>
 
-
         <!-- Submit -->
         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
     </form>
 </div>
+
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const systemDropdown = document.getElementById('system');
+    const subSystemDropdown = document.getElementById('sub_system');
+
+    if (systemDropdown) {
+        systemDropdown.addEventListener('change', function (e) {
+            e.preventDefault(); // Prevent form submission
+            const selectedSystem = this.value;
+
+            // Clear sub-system dropdown
+            subSystemDropdown.innerHTML = '<option value="">-- Select Sub-system --</option>';
+
+            if (selectedSystem) {
+                fetch(`/get-sub-systems?system=${selectedSystem}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(subSystem => {
+                            const option = document.createElement('option');
+                            option.value = subSystem;
+                            option.textContent = subSystem;
+                            subSystemDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    }
+});
+    // CKEditor for Scope and Description
     CKEDITOR.replace('scope', {
         filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
         filebrowserUploadMethod: 'form'
@@ -101,5 +129,4 @@
         filebrowserUploadMethod: 'form'
     });
 </script>
-
 @endsection

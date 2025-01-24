@@ -5,62 +5,65 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class TicketController extends Controller
 {
-    // Show the list of tickets
+    // Display the list of tickets for the authenticated user
     public function index()
     {
-        $tickets = Ticket::where('user_id', Auth::id())->get();
+        $tickets = Ticket::where('user_id', Auth::id())->paginate(10);
         return view('ticket.index', compact('tickets'));
     }
 
-    // Show the form for creating a new software ticket
+    // Display the software ticket form
     public function showSoftwareForm()
     {
-        return view('ticket.software_form'); // Pastikan file view ini ada
+        return view('ticket.software_form');
     }
 
+    // Display the hardware ticket form
     public function showHardwareForm()
     {
-        return view('ticket.hardware_form'); // Pastikan file view ini ada
+        return view('ticket.hardware_form');
     }
 
+    // Display monitoring tickets with filters
     public function monitoring(Request $request)
     {
         $query = Ticket::where('user_id', Auth::id());
 
-        // Filter berdasarkan status
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
 
-        // Filter berdasarkan pencarian
         if ($request->has('search') && $request->search !== '') {
             $query->where('id', 'like', '%' . $request->search . '%');
         }
 
-        // Paginate tiket
         $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
-
         return view('ticket.monitoring', compact('tickets'));
     }
 
+    // Display a single ticket details
     public function show($id)
     {
-        $ticket = Ticket::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-
+        $ticket = Ticket::where('id', $id)
+                        ->where('user_id', Auth::id())
+                        ->firstOrFail();
         return view('ticket.show', compact('ticket'));
     }
 
+    // Submit a new software ticket
     public function submitSoftwareTicket(Request $request)
     {
         $request->validate([
-            'system' => 'required',
-            'sub_system' => 'required',
-            'sw_wo_type' => 'required',
-            'scope' => 'required',
-            'description' => 'required',
+            'system' => 'required|string',
+            'sub_system' => 'required|string',
+            'sw_wo_type' => 'required|string',
+            'scope' => 'required|string',
+            'description' => 'required|string',
         ]);
 
         Ticket::create([
@@ -74,33 +77,33 @@ class TicketController extends Controller
             'status' => 'Open',
         ]);
 
-        return redirect()->route('user.dashboard')->with('success', 'Software ticket submitted successfully!');
+        return redirect()->route('user.dashboard')->with('success', 'Software ticket submitted successfully.');
     }
 
-    // Store a new ticket
-    public function store(Request $request)
+    // Submit a new hardware ticket
+    public function submitHardwareTicket(Request $request)
     {
         $request->validate([
-            'type' => 'required',
-            'system' => 'nullable',
-            'sub_system' => 'nullable',
-            'wo_type' => 'required',
-            'scope' => 'required',
-            'description' => 'required',
+            'infrastructure' => 'required|string',
+            'hardware' => 'required|string',
+            'scope' => 'required|string',
+            'description' => 'required|string',
         ]);
 
         Ticket::create([
             'user_id' => Auth::id(),
-            'type' => $request->type,
-            'system' => $request->system,
-            'sub_system' => $request->sub_system,
-            'wo_type' => $request->wo_type,
+            'type' => 'Hardware',
+            'infrastructure' => $request->infrastructure,
+            'hardware' => $request->hardware,
             'scope' => $request->scope,
             'description' => $request->description,
+            'status' => 'Open',
         ]);
 
-        return redirect()->route('ticket.index')->with('success', 'Ticket created successfully!');
+        return redirect()->route('user.dashboard')->with('success', 'Hardware ticket submitted successfully.');
     }
+
+    // Get subsystems dynamically based on the selected system
     public function getSubSystems(Request $request)
     {
         $system = $request->query('system');
@@ -125,81 +128,47 @@ class TicketController extends Controller
             case 'MSF':
                 $subSystems = ['Sales'];
                 break;
+            default:
+                $subSystems = ['No Subsystems Available'];
         }
 
         return response()->json($subSystems);
     }
 
+    // Get hardware dynamically based on the selected infrastructure
     public function getHardwares(Request $request)
     {
-        $infrastructure = $request->query('infrastructure');
-        $hardwares = [];
-
-        switch ($infrastructure) {
-            case 'Peripheral':
-                $hardwares = ['Computer', 'Printer', 'FAX', 'Scanner', 'Telephone', 'Modem', 'Others'];
-                break;
-            case 'Server':
-                $hardwares = ['Email Server', 'SAP Server', 'Web Server'];
-                break;
-            case 'Internet':
-                $hardwares = ['-'];
-                break;
-        }
-
-        return response()->json($hardwares);
+        return response()->json(match($request->infrastructure) {
+            'Peripheral' => ['Computer', 'Printer', 'FAX', 'Scanner', 'Telephone', 'Modem', 'Others'],
+            'Server' => ['Email Server', 'SAP Server', 'Web Server'],
+            'Internet' => ['-'],
+            default => [],
+        });
     }
 
-    public function submitHardwareTicket(Request $request)
-    {
-        $request->validate([
-            'infrastructure' => 'required',
-            'hardware' => 'required',
-            'scope' => 'required',
-            'description' => 'required',
-        ]);
-
-        Ticket::create([
-            'user_id' => Auth::id(),
-            'type' => 'Hardware',
-            'infrastructure' => $request->infrastructure,
-            'hardware' => $request->hardware,
-            'scope' => $request->scope,
-            'description' => $request->description,
-            'status' => 'Open',
-        ]);
-
-        return redirect()->route('user.dashboard')->with('success', 'Hardware ticket submitted successfully!');
-    }
-
-
+    // Display the user's work order list
     public function workOrderList(Request $request)
     {
         $query = Ticket::where('user_id', Auth::id());
 
-        // Filter berdasarkan status
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
 
-        // Filter berdasarkan pencarian
         if ($request->has('search') && $request->search !== '') {
             $query->where('id', 'like', '%' . $request->search . '%');
         }
 
-        // Paginate tiket
         $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
-
         return view('ticket.work_order_list', compact('tickets'));
     }
 
-    //delete ticket
+    // Delete a ticket
     public function destroy($id)
     {
         $ticket = Ticket::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $ticket->delete();
 
-        return redirect()->route('user.tickets.monitoring')->with('success', 'Ticket deleted successfully!');
+        return redirect()->route('user.tickets.monitoring')->with('success', 'Ticket deleted successfully.');
     }
-
 }

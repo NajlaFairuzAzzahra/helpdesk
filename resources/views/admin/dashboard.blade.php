@@ -25,6 +25,7 @@
                 </option>
             @endforeach
         </select>
+        <input type="text" name="search" placeholder="Search Tickets" value="{{ request('search') }}" class="px-4 py-2 border rounded">
     </form>
 
     <!-- Ticket Table -->
@@ -43,10 +44,15 @@
                 <tr class="border-b hover:bg-gray-100">
                     <td class="py-2 px-4">{{ $ticket->id }}</td>
                     <td class="py-2 px-4">{{ $ticket->type }}</td>
-                    <td class="py-2 px-4">{{ $ticket->user->name }}</td>
+                    <td class="py-2 px-4">{{ $ticket->user->name ?? 'Unknown' }}</td>
                     <td class="py-2 px-4">{{ $ticket->status }}</td>
-                    <td class="py-2 px-4">
-                        <!-- Delete Button -->
+                    <td class="py-2 px-4 space-x-4">
+                        <button
+                            type="button"
+                            class="text-blue-500 hover:underline"
+                            onclick="openEditModal({{ $ticket->id }})">
+                            Edit
+                        </button>
                         <button
                             type="button"
                             class="text-red-500 hover:underline"
@@ -68,8 +74,36 @@
     </div>
 </div>
 
-<!-- Delete Modal -->
+<!-- Modals -->
 @foreach ($tickets as $ticket)
+<!-- Edit Modal -->
+<div id="editModal-{{ $ticket->id }}" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white rounded shadow p-6 w-1/3">
+        <h2 class="text-xl font-bold mb-4">Edit Ticket</h2>
+        <form method="POST" action="{{ route('admin.tickets.update', $ticket->id) }}" onsubmit="return false;">
+            @csrf
+            @method('POST')
+            <label for="status" class="block text-gray-700 font-bold mb-2">Status:</label>
+            <select
+                name="status"
+                id="status-{{ $ticket->id }}"
+                class="w-full px-3 py-2 border rounded mb-4"
+                onchange="handleStatusChange(event, {{ $ticket->id }})"
+            >
+                <option value="Open" {{ $ticket->status === 'Open' ? 'selected' : '' }}>Open</option>
+                <option value="Pending" {{ $ticket->status === 'Pending' ? 'selected' : '' }}>Pending</option>
+                <option value="Closed" {{ $ticket->status === 'Closed' ? 'selected' : '' }}>Closed</option>
+            </select>
+            <div class="flex justify-end space-x-4">
+                <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded" onclick="closeEditModal({{ $ticket->id }})">Cancel</button>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Delete Modal -->
 <div id="deleteModal-{{ $ticket->id }}" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center">
     <div class="bg-white rounded shadow p-6 w-1/3">
         <h2 class="text-xl font-bold mb-4">Confirm Delete</h2>
@@ -92,4 +126,5 @@
     </div>
 </div>
 @endforeach
+
 @endsection
